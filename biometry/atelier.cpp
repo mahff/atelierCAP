@@ -1,16 +1,9 @@
-/**
- * \file atelier.cpp
- * \brief Programme pour une plateforme de stabilisation visuel
- * \author Arab Brahim et Pauquet Jean-Philippe
- * \date 23 oct 2020
- */
-
 #include "opencv2/opencv.hpp"
 #include "iostream"
 #include "math.h"
 #include "time.h"
 #include <errno.h>
-#include <fcntl.h> 
+#include <fcntl.h>
 #include <string.h>
 #include <termios.h>
 #include <unistd.h>
@@ -52,14 +45,14 @@ Point barycentre(Mat gray)
     baryY = cumulRows / nbOfPix;
     p.x = baryX;
     p.y = baryY;
-    
+
     return p;
 }
 
 /**
  * \fn int maskOnPix(Mat frame, int masque[3][3], int i, int j)
  * \brief Convolue un pixel par un masque donné
- * 
+ *
  * \param[in] frame Image en niveau de gris
  * \param[in] masque Masque à utiliser pour la convolution
  * \param[in] i Coordonnée en ordonnée du pixel à convoluer
@@ -84,7 +77,7 @@ int maskOnPix(Mat frame, int masque[3][3], int i, int j){
  * \brief Calcule le gradient vertical et horizontal PAS UTILISÉ
  */
 Mat gradientFunction(Mat gray){
-	
+
     int rows = gray.rows;
     int cols = gray.cols;
 
@@ -93,7 +86,7 @@ Mat gradientFunction(Mat gray){
     Mat gradientY(rows, cols, CV_64F);
     Mat theta(rows, cols, CV_64F);
     Mat beta(rows, cols, CV_64F);
-    
+
 
     float lut[360] = {0};
     int cnt[360] = {0};
@@ -112,7 +105,7 @@ Mat gradientFunction(Mat gray){
         for(int j = 1; j<cols-1 ; j++){
             tmpy = maskOnPix(gray, masqueGradientVertical, i, j);
             tmpy /= 4;
-            
+
             tmpx = maskOnPix(gray, masqueGradientHorizontal, i, j);
             tmpx /= 4;
 
@@ -164,7 +157,7 @@ Mat gradientFunction(Mat gray){
             }
 
         }
-    
+
 
     for(int i = 1; i<rows-1 ; i++){
         for(int j = 1; j<cols-1 ; j++){
@@ -187,13 +180,13 @@ Mat getCircle()
         {
             frame.at<uchar>(i, j) = 0;
         }
-        
+
     }
 
     cv::circle(frame, Point(WIDTH/2, HEIGHT/2), 10, (255, 255, 255));
 
     return frame;
-    
+
 }
 
 Mat getELipse()
@@ -205,12 +198,12 @@ Mat getELipse()
         {
             frame.at<uchar>(i, j) = 0;
         }
-        
+
     }
 
     cv::ellipse(frame, Point( WIDTH/2, HEIGHT/2 ), Size( 50.0, 100.0 ), 0, 0, 360, Scalar( 255, 0, 0 ), 3, 8 );
     return frame;
-    
+
 }
 
 
@@ -227,21 +220,21 @@ int main() {
     Mat snapshot;
 
 
-    camera >> frameT; 
+    camera >> frameT;
     cvtColor(frameT, grayT, COLOR_BGR2GRAY);
-    
+
     outputT = gradientFunction(grayT);
 
     //Point p = barycentre(outputT);
     //cout << p.x << " | " << p.y << endl;
 
-    frame = imread("elipse_noir_fond_blanc_2.png", IMREAD_GRAYSCALE);
+    frame = imread("cercle_noir_fond_blanc_2.png", IMREAD_GRAYSCALE);
     frame = gradientFunction(frame);
     Point b = barycentre(frame);
     cv::circle(frame, Point(b.x, b.y),10,(255, 255, 255),10);
     cv::imshow("Webcam", frame);
 
-    
+
 
     while (1) {
         //  //camera >> frameT1;
@@ -253,7 +246,7 @@ int main() {
         //  outputT = outputT1;
         // // outputT.convertTo(outputT, CV_8UC1);
         // // outputT1.convertTo(outputT1, CV_8UC1);
-        
+
         // cv::imshow("Webcam", outputT);
         // //.convertTo(outputT, CV_32F);
 
